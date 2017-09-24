@@ -22,7 +22,7 @@ def compute_partial_repr(input_points, control_points):
 
 class ThinPlateSpline(nn.Module):
 
-    def __init__(self, height, width, target_control_points):
+    def __init__(self, target_height, target_width, target_control_points):
         super(ThinPlateSpline, self).__init__()
         assert target_control_points.ndimension() == 2
         assert target_control_points.size(1) == 2
@@ -42,12 +42,12 @@ class ThinPlateSpline(nn.Module):
         inverse_kernel = torch.inverse(forward_kernel)
 
         # create target cordinate matrix
-        HW = height * width
-        target_coordinate = list(itertools.product(range(1, height + 1), range(1, width + 1)))
+        HW = target_height * target_width
+        target_coordinate = list(itertools.product(range(1, target_height + 1), range(1, target_width + 1)))
         target_coordinate = torch.Tensor(target_coordinate) # HW x 2
         Y, X = target_coordinate.split(1, dim = 1)
-        Y = Y * 2 / height - 1
-        X = X * 2 / width - 1
+        Y = Y * 2 / target_height - 1
+        X = X * 2 / target_width - 1
         target_coordinate = torch.cat([X, Y], dim = 1) # convert from (y, x) to (x, y)
         target_coordinate_partial_repr = compute_partial_repr(target_coordinate, target_control_points)
         target_coordinate_repr = torch.cat([
