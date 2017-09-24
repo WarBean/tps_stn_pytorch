@@ -1,6 +1,8 @@
 # encoding: utf-8
 
+import os
 import torch
+import random
 import argparse
 from PIL import Image, ImageDraw
 from mnist_model import STNClsNet
@@ -19,7 +21,10 @@ test_loader = torch.utils.data.DataLoader(
     datasets.MNIST(
         '../data',
         train=False,
-        transform=transforms.Compose([transforms.ToTensor()]),
+        transform=transforms.Compose([
+            transforms.Lambda(lambda image: image.rotate(random.random() * 120 - 60)),
+            transforms.ToTensor(),
+        ]),
     ),
     batch_size = args.batch_size,
     shuffle = True,
@@ -29,6 +34,9 @@ test_loader = torch.utils.data.DataLoader(
 
 model = STNClsNet()
 model.load_state_dict(torch.load(args.checkpoint))
+
+if not os.path.isdir('image'):
+    os.makedirs('image')
 
 for batch_idx, (source_data, target) in enumerate(test_loader):
     print(batch_idx)
@@ -52,4 +60,3 @@ for batch_idx, (source_data, target) in enumerate(test_loader):
             y = (y + 1) / 2 * 28
             draw.rectangle([x - 1, y - 1, x + 1, y + 1], fill = (255, 0, 0))
         image.save('image/%04d.jpg' % (batch_idx * args.batch_size + i))
-

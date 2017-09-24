@@ -1,4 +1,6 @@
+import os
 import torch
+import random
 import argparse
 import torch.nn as nn
 import torch.optim as optim
@@ -30,7 +32,10 @@ train_loader = torch.utils.data.DataLoader(
         '../data',
         train=True,
         download=True,
-        transform=transforms.Compose([transforms.ToTensor()]),
+        transform=transforms.Compose([
+            transforms.Lambda(lambda image: image.rotate(random.random() * 120 - 60)),
+            transforms.ToTensor(),
+        ]),
     ),
     batch_size = args.batch_size,
     shuffle = True,
@@ -41,7 +46,9 @@ test_loader = torch.utils.data.DataLoader(
     datasets.MNIST(
         '../data',
         train=False,
-        transform=transforms.Compose([transforms.ToTensor()]),
+        transform=transforms.Compose([
+            transforms.ToTensor(),
+        ]),
     ),
     batch_size = args.batch_size,
     shuffle = True,
@@ -96,9 +103,11 @@ def test(epoch):
         100. * correct / len(test_loader.dataset)))
 
 
+if not os.path.isdir('checkpoint'):
+    os.makedirs('checkpoint')
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     test(epoch)
-    torch.save(model.cpu().state_dict(), 'checkpoint_%s_%03d.pth' % (args.model, epoch))
+    torch.save(model.cpu().state_dict(), 'checkpoint/%s_%03d.pth' % (args.model, epoch))
     if args.cuda:
         model.cuda()

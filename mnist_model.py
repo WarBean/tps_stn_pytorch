@@ -1,7 +1,9 @@
 # encoding: utf-8
 
+import math
 import torch
 import itertools
+import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from grid_sample import grid_sample
@@ -35,31 +37,37 @@ class ClsNet(nn.Module):
     def forward(self, x):
         return F.log_softmax(self.cnn(x))
 
+def get_control_points(grid_size):
+    return np.array(list(itertools.product(
+        np.arange(-1.0, 1.00001, 2.0 / (grid_size - 1)),
+        np.arange(-1.0, 1.00001, 2.0 / (grid_size - 1)),
+    )))
+
 class GridLocNet(nn.Module):
 
     def __init__(self, grid_size):
         super(GridLocNet, self).__init__()
         self.cnn = CNN(grid_size ** 2 * 2)
-        self.cnn.fc2.weight.data.mul_(0.001)
-        control_points = torch.Tensor(list(itertools.product(
-            torch.arange(-1.0, 1.00001, 2.0 / (grid_size - 1)),
-            torch.arange(-1.0, 1.00001, 2.0 / (grid_size - 1)),
-        )))
-        self.register_buffer('control_points', control_points)
+
+        control_points = get_control_points(grid_size).clip(-0.999, 0.999)
+        bias = np.arctanh(control_points)
+        bias = torch.from_numpy(bias).view(-1)
+        self.cnn.fc2.bias.data.copy_(bias)
+        self.cnn.fc2.weight.data.zero_()
 
     def forward(self, x):
         batch_size = x.size(0)
-        offset = F.tanh(self.cnn(x))
-        points = Variable(self.control_points) + offset.view(batch_size, -1, 2)
-        return points
+        points = F.tanh(self.cnn(x))
+        return points.view(batch_size, -1, 2)
 
 class STNClsNet(nn.Module):
 
     def __init__(self):
         super(STNClsNet, self).__init__()
-        self.loc_net = GridLocNet(4)
+        grid_size = 3
+        self.loc_net = GridLocNet(grid_size)
         self.cls_net = ClsNet()
-        self.tps = TPSGridGen(28, 28, self.loc_net.control_points)
+        self.tps = TPSGridGen(28, 28, torch.from_numpy(get_control_points(grid_size)))
 
     def forward(self, x):
         batch_size = x.size(0)
