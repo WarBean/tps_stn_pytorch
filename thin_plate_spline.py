@@ -46,6 +46,8 @@ class ThinPlateSpline(nn.Module):
         target_coordinate = list(itertools.product(range(1, height + 1), range(1, width + 1)))
         target_coordinate = torch.Tensor(target_coordinate) # HW x 2
         Y, X = target_coordinate.split(1, dim = 1)
+        Y = Y * 2 / height - 1
+        X = X * 2 / width - 1
         target_coordinate = torch.cat([X, Y], dim = 1) # convert from (y, x) to (x, y)
         target_coordinate_partial_repr = compute_partial_repr(target_coordinate, target_control_points)
         target_coordinate_repr = torch.cat([
