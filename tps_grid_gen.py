@@ -20,10 +20,10 @@ def compute_partial_repr(input_points, control_points):
     repr_matrix.masked_fill_(mask, 0)
     return repr_matrix
 
-class ThinPlateSpline(nn.Module):
+class TPSGridGen(nn.Module):
 
     def __init__(self, target_height, target_width, target_control_points):
-        super(ThinPlateSpline, self).__init__()
+        super(TPSGridGen, self).__init__()
         assert target_control_points.ndimension() == 2
         assert target_control_points.size(1) == 2
         N = target_control_points.size(0)

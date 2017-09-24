@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 from grid_sample import grid_sample
 from torch.autograd import Variable
-from thin_plate_spline import ThinPlateSpline
+from tps_grid_gen import TPSGridGen
 
 source_image = Image.open('source.jpg').convert(mode = 'RGB')
 source_image = np.array(source_image).astype('float32')
@@ -26,7 +26,7 @@ source_control_points = target_control_points + torch.Tensor(target_control_poin
 
 print('initialize module')
 beg_time = time.time()
-tps = ThinPlateSpline(target_height, target_width, target_control_points)
+tps = TPSGridGen(target_height, target_width, target_control_points)
 past_time = time.time() - beg_time
 print('initialization takes %.02fs' % past_time)
 

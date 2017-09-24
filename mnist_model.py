@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from grid_sample import grid_sample
 from torch.autograd import Variable
-from thin_plate_spline import ThinPlateSpline
+from tps_grid_gen import TPSGridGen
 
 class CNN(nn.Module):
     def __init__(self, num_output):
@@ -35,10 +35,10 @@ class ClsNet(nn.Module):
     def forward(self, x):
         return F.log_softmax(self.cnn(x))
 
-class LocNet(nn.Module):
+class GridLocNet(nn.Module):
 
     def __init__(self, grid_size):
-        super(LocNet, self).__init__()
+        super(GridLocNet, self).__init__()
         self.cnn = CNN(grid_size ** 2 * 2)
         self.cnn.fc2.weight.data.mul_(0.001)
         control_points = torch.Tensor(list(itertools.product(
@@ -57,9 +57,9 @@ class STNClsNet(nn.Module):
 
     def __init__(self):
         super(STNClsNet, self).__init__()
-        self.loc_net = LocNet(4)
+        self.loc_net = GridLocNet(4)
         self.cls_net = ClsNet()
-        self.tps = ThinPlateSpline(28, 28, self.loc_net.control_points)
+        self.tps = TPSGridGen(28, 28, self.loc_net.control_points)
 
     def forward(self, x):
         batch_size = x.size(0)
