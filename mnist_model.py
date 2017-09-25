@@ -43,10 +43,10 @@ def get_control_points(grid_size):
         np.arange(-1.0, 1.00001, 2.0 / (grid_size - 1)),
     )))
 
-class GridLocNet(nn.Module):
+class BoundedGridLocNet(nn.Module):
 
     def __init__(self, grid_size):
-        super(GridLocNet, self).__init__()
+        super(BoundedGridLocNet, self).__init__()
         self.cnn = CNN(grid_size ** 2 * 2)
 
         control_points = get_control_points(grid_size).clip(-0.999, 0.999)
@@ -60,11 +60,31 @@ class GridLocNet(nn.Module):
         points = F.tanh(self.cnn(x))
         return points.view(batch_size, -1, 2)
 
+class UnBoundedGridLocNet(nn.Module):
+
+    def __init__(self, grid_size):
+        super(UnBoundedGridLocNet, self).__init__()
+        self.cnn = CNN(grid_size ** 2 * 2)
+
+        control_points = get_control_points(grid_size)
+        bias = torch.from_numpy(control_points).view(-1)
+        self.cnn.fc2.bias.data.copy_(bias)
+        self.cnn.fc2.weight.data.zero_()
+
+    def forward(self, x):
+        batch_size = x.size(0)
+        points = self.cnn(x)
+        return points.view(batch_size, -1, 2)
+
 class STNClsNet(nn.Module):
 
-    def __init__(self):
+    def __init__(self, model_type):
         super(STNClsNet, self).__init__()
         grid_size = 3
+        GridLocNet = {
+            'unbounded_stn': UnBoundedGridLocNet,
+            'bounded_stn': BoundedGridLocNet,
+        }[model_type]
         self.loc_net = GridLocNet(grid_size)
         self.cls_net = ClsNet()
         self.tps = TPSGridGen(28, 28, torch.from_numpy(get_control_points(grid_size)))

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import os
 import torch
 import random
@@ -10,16 +12,16 @@ from mnist_model import STNClsNet, ClsNet
 from torchvision import datasets, transforms
 
 # Training settings
-parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
-parser.add_argument('--batch-size', type=int, default=64, metavar='N')
-parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N')
-parser.add_argument('--epochs', type=int, default=10, metavar='N')
-parser.add_argument('--lr', type=float, default=0.01, metavar='LR')
-parser.add_argument('--momentum', type=float, default=0.5, metavar='M')
-parser.add_argument('--no-cuda', action='store_true', default=False)
-parser.add_argument('--seed', type=int, default=1, metavar='S')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N')
-parser.add_argument('--model', default='stn')
+parser.add_argument('--batch-size', type = int, default = 64)
+parser.add_argument('--test-batch-size', type = int, default = 1000)
+parser.add_argument('--epochs', type = int, default = 10)
+parser.add_argument('--lr', type = float, default = 0.01)
+parser.add_argument('--momentum', type=float, default = 0.5)
+parser.add_argument('--no-cuda', action = 'store_true', default = False)
+parser.add_argument('--seed', type = int, default = 1)
+parser.add_argument('--log-interval', type = int, default = 10, metavar = 'N')
+parser.add_argument('--model', required = True)
+parser.add_argument('--angle', type = int, default=60)
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -29,11 +31,11 @@ if args.cuda:
 
 train_loader = torch.utils.data.DataLoader(
     datasets.MNIST(
-        '../data',
-        train=True,
-        download=True,
-        transform=transforms.Compose([
-            transforms.Lambda(lambda image: image.rotate(random.random() * 120 - 60)),
+        'mnist_data',
+        train = True,
+        download = True,
+        transform = transforms.Compose([
+            transforms.Lambda(lambda image: image.rotate(random.random() * args.angle * 2 - args.angle)),
             transforms.ToTensor(),
         ]),
     ),
@@ -44,9 +46,9 @@ train_loader = torch.utils.data.DataLoader(
 )
 test_loader = torch.utils.data.DataLoader(
     datasets.MNIST(
-        '../data',
-        train=False,
-        transform=transforms.Compose([
+        'mnist_data',
+        train = False,
+        transform = transforms.Compose([
             transforms.ToTensor(),
         ]),
     ),
@@ -56,16 +58,16 @@ test_loader = torch.utils.data.DataLoader(
     pin_memory = True if args.cuda else False,
 )
 
-if args.model == 'stn':
-    print('create model with STN')
-    model = STNClsNet()
-else:
+if args.model == 'no_stn':
     print('create model without STN')
     model = ClsNet()
+else:
+    print('create model with STN')
+    model = STNClsNet(args.model)
 if args.cuda:
     model.cuda()
 
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+optimizer = optim.SGD(model.parameters(), lr = args.lr, momentum = args.momentum)
 
 def train(epoch):
     model.train()
