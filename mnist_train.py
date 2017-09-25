@@ -20,7 +20,8 @@ parser.add_argument('--lr', type = float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.5)
 parser.add_argument('--no-cuda', action = 'store_true', default = False)
 parser.add_argument('--seed', type = int, default = 1)
-parser.add_argument('--log-interval', type = int, default = 10, metavar = 'N')
+parser.add_argument('--log-interval', type = int, default = 10)
+parser.add_argument('--save-interval', type = int, default = 100)
 parser.add_argument('--model', required = True)
 parser.add_argument('--angle', type = int, default=60)
 parser.add_argument('--grid_size', type = int, default = 3)
@@ -54,6 +55,11 @@ def train(epoch):
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.data[0]))
+        if batch_idx % args.save_interval == 0:
+            checkpoint_path = checkpoint_dir + 'epoch%03d_iter%03d.pth' % (epoch, batch_idx)
+            torch.save(model.cpu().state_dict(), checkpoint_path)
+            if args.cuda:
+                model.cuda()
 
 def test(epoch):
     model.eval()
@@ -75,11 +81,11 @@ def test(epoch):
         100. * correct / len(test_loader.dataset)))
 
 
-if not os.path.isdir('checkpoint'):
-    os.makedirs('checkpoint')
+checkpoint_dir = 'checkpoint/%s_angle%d_grid%d/' % (
+    args.model, args.angle, args.grid_size,
+))
+if not os.path.isdir(checkpoint_dir):
+    os.makedirs(checkpoint_dir)
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     test(epoch)
-    torch.save(model.cpu().state_dict(), 'checkpoint/%s_angle%d_%03d.pth' % (args.model, args.angle, epoch))
-    if args.cuda:
-        model.cuda()
