@@ -4,14 +4,15 @@ import os
 import torch
 import random
 import argparse
+import mnist_model
+import data_loader
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
-from mnist_model import STNClsNet, ClsNet
-from torchvision import datasets, transforms
 
 # Training settings
+parser = argparse.ArgumentParser()
 parser.add_argument('--batch-size', type = int, default = 64)
 parser.add_argument('--test-batch-size', type = int, default = 1000)
 parser.add_argument('--epochs', type = int, default = 10)
@@ -22,6 +23,7 @@ parser.add_argument('--seed', type = int, default = 1)
 parser.add_argument('--log-interval', type = int, default = 10, metavar = 'N')
 parser.add_argument('--model', required = True)
 parser.add_argument('--angle', type = int, default=60)
+parser.add_argument('--grid_size', type = int, default = 3)
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -29,45 +31,13 @@ torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
 
-train_loader = torch.utils.data.DataLoader(
-    datasets.MNIST(
-        'mnist_data',
-        train = True,
-        download = True,
-        transform = transforms.Compose([
-            transforms.Lambda(lambda image: image.rotate(random.random() * args.angle * 2 - args.angle)),
-            transforms.ToTensor(),
-        ]),
-    ),
-    batch_size = args.batch_size,
-    shuffle = True,
-    num_workers = 4,
-    pin_memory = True if args.cuda else False,
-)
-test_loader = torch.utils.data.DataLoader(
-    datasets.MNIST(
-        'mnist_data',
-        train = False,
-        transform = transforms.Compose([
-            transforms.ToTensor(),
-        ]),
-    ),
-    batch_size = args.batch_size,
-    shuffle = True,
-    num_workers = 4,
-    pin_memory = True if args.cuda else False,
-)
-
-if args.model == 'no_stn':
-    print('create model without STN')
-    model = ClsNet()
-else:
-    print('create model with STN')
-    model = STNClsNet(args.model)
+model = mnist_model.get_model(args)
 if args.cuda:
     model.cuda()
 
 optimizer = optim.SGD(model.parameters(), lr = args.lr, momentum = args.momentum)
+train_loader = data_loader.get_train_loader(args)
+test_loader = data_loader.get_test_loader(args)
 
 def train(epoch):
     model.train()
@@ -110,6 +80,6 @@ if not os.path.isdir('checkpoint'):
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     test(epoch)
-    torch.save(model.cpu().state_dict(), 'checkpoint/%s_%03d.pth' % (args.model, epoch))
+    torch.save(model.cpu().state_dict(), 'checkpoint/%s_angle%d_%03d.pth' % (args.model, args.angle, epoch))
     if args.cuda:
         model.cuda()

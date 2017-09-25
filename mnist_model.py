@@ -78,16 +78,15 @@ class UnBoundedGridLocNet(nn.Module):
 
 class STNClsNet(nn.Module):
 
-    def __init__(self, model_type):
+    def __init__(self, args):
         super(STNClsNet, self).__init__()
-        grid_size = 3
         GridLocNet = {
             'unbounded_stn': UnBoundedGridLocNet,
             'bounded_stn': BoundedGridLocNet,
-        }[model_type]
-        self.loc_net = GridLocNet(grid_size)
+        }[args.model]
+        self.loc_net = GridLocNet(args.grid_size)
         self.cls_net = ClsNet()
-        self.tps = TPSGridGen(28, 28, torch.from_numpy(get_control_points(grid_size)))
+        self.tps = TPSGridGen(28, 28, torch.from_numpy(get_control_points(args.grid_size)))
 
     def forward(self, x):
         batch_size = x.size(0)
@@ -97,3 +96,12 @@ class STNClsNet(nn.Module):
         transformed_x = grid_sample(x, grid)
         logit = self.cls_net(transformed_x)
         return logit
+
+def get_model(args):
+    if args.model == 'no_stn':
+        print('create model without STN')
+        model = ClsNet()
+    else:
+        print('create model with STN')
+        model = STNClsNet(args)
+    return model
