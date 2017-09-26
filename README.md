@@ -1,11 +1,9 @@
 # tps_stn_pytorch
 PyTorch implementation of Spatial Transformer Network (STN) with Thin Plate Spline (TPS).
 
-<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/top_1.gif" height = "300"/>
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/top_1.gif" height = "200"/>
 
-<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/top_2.gif" height = "300"/>
-
----
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/top_2.gif" height = "200"/>
 
 ## Introduction
 
@@ -13,17 +11,15 @@ STN is a powerful neural network architecture proposed by DeepMind in [[1]](#ref
 
 Original STN paper [[1]](#ref-1) experiments on three specific transformation forms: Affine Transformation, Projective Transformation and **Thin Plate Spline Transformation (TPS)**.  Among them I think TPS is the most powerful translation because it can warp a image in arbitrary way. As shown below, I can warp my Avatar
 
-<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/source_avatar.jpg" height = "300"/>
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/source_avatar.jpg" height = "200"/>
 
 into
 
-<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/target_avatar.jpg" height = "300"/>
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/target_avatar.jpg" height = "200"/>
 
 TPS-STN has been used in OCR application [[2]](#ref-2). In this paper TPS-STN is to automatically rectify distorted text images, before they are feeded into a normal OCR text recognition model:
 
-<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/ocr.jpg" height = "300"/>
-
----
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/ocr.jpg" height = "130"/>
 
 ## Dependencies
 
@@ -36,8 +32,6 @@ TPS-STN has been used in OCR application [[2]](#ref-2). In this paper TPS-STN is
 
 I use `imageio` for creating GIF visualization. Simply install it by `pip install imageio`.
 
----
-
 ## Run
 
 	python mnist_train.py --model unbounded_stn --angle 90 --gird_size 4
@@ -47,8 +41,6 @@ I use `imageio` for creating GIF visualization. Simply install it by `pip instal
 Then PNG and GIF resutls will be saved in `./image/unbounded_stn_angle60_grid4/` and `./gif/unbounded_stn_angle60_grid4/`.
 
 You can try other combinations of model architecture, mnist random rotation angle and TPS grid size. Details below.
-
----
 
 ## Arguments
 
@@ -65,11 +57,7 @@ There are three controllable arguments: `--model`, `--angle`, `--grid_size`.
 `--grid_size`: int, default = 4
 - Use `(grid_size x grid_size)` control points to define Thin Plate Spline transformation
 
----
-
 ## Visualization Results
-
----
 
 ## Reference
 
