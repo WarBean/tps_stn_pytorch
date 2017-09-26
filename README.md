@@ -60,7 +60,7 @@ There are three controllable arguments: `--model`, `--angle`, `--grid_size`.
 
 ## Test Accuracy Curves
 
-<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/curve.png" height = "200"/>
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/curve.png" height = "900"/>
 
 ## Visualize TPS-STN
 
