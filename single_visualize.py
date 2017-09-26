@@ -9,7 +9,7 @@ from grid_sample import grid_sample
 from torch.autograd import Variable
 from tps_grid_gen import TPSGridGen
 
-source_image = Image.open('source.jpg').convert(mode = 'RGB')
+source_image = Image.open('demo/source_avatar.jpg').convert(mode = 'RGB')
 source_image = np.array(source_image).astype('float32')
 source_image = np.expand_dims(source_image.swapaxes(2, 1).swapaxes(1, 0), 0)
 source_image = Variable(torch.from_numpy(source_image))
@@ -22,7 +22,7 @@ target_control_points = torch.Tensor(list(itertools.product(
     torch.arange(-1.0, 1.00001, 2.0 / 4),
     torch.arange(-1.0, 1.00001, 2.0 / 4),
 )))
-source_control_points = target_control_points + torch.Tensor(target_control_points.size()).uniform_(-0.08, 0.08)
+source_control_points = target_control_points + torch.Tensor(target_control_points.size()).uniform_(-0.1, 0.1)
 
 print('initialize module')
 beg_time = time.time()
@@ -36,4 +36,4 @@ canvas = Variable(torch.Tensor(1, 3, target_height, target_width).fill_(255))
 target_image = grid_sample(source_image, grid, canvas)
 target_image = target_image.data.numpy().squeeze().swapaxes(0, 1).swapaxes(1, 2)
 target_image = Image.fromarray(target_image.astype('uint8'))
-target_image.save('target.jpg')
+target_image.save('demo/target_avatar.jpg')

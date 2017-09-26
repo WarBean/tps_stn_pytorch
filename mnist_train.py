@@ -83,7 +83,7 @@ def test(epoch):
 
 checkpoint_dir = 'checkpoint/%s_angle%d_grid%d/' % (
     args.model, args.angle, args.grid_size,
-))
+)
 if not os.path.isdir(checkpoint_dir):
     os.makedirs(checkpoint_dir)
 for epoch in range(1, args.epochs + 1):

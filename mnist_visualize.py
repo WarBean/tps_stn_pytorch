@@ -26,6 +26,8 @@ random.seed(1024)
 
 assert args.model in ['bounded_stn', 'unbounded_stn']
 model = mnist_model.get_model(args)
+if args.cuda:
+    model.cuda()
 image_dir = 'image/%s_angle%d_grid%d/' % (args.model, args.angle, args.grid_size)
 if not os.path.isdir(image_dir):
     os.makedirs(image_dir)
