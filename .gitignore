@@ -5,3 +5,4 @@ mnist_data
 checkpoint
 image
 gif
+accuracy_log

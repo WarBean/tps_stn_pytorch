@@ -76,9 +76,13 @@ def test(epoch):
 
     test_loss = test_loss
     test_loss /= len(test_loader) # loss function already averages over batch size
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    accuracy = 100. * correct / len(test_loader.dataset)
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.02f}%)\n'.format(
+        test_loss, correct, len(test_loader.dataset), accuracy,
+    ))
+    log_file.write('{:.02f}\n'.format(accuracy))
+    log_file.flush()
+    os.fsync(log_file)
 
 
 checkpoint_dir = 'checkpoint/%s_angle%d_grid%d/' % (
@@ -86,6 +90,13 @@ checkpoint_dir = 'checkpoint/%s_angle%d_grid%d/' % (
 )
 if not os.path.isdir(checkpoint_dir):
     os.makedirs(checkpoint_dir)
-for epoch in range(1, args.epochs + 1):
-    train(epoch)
-    test(epoch)
+if not os.path.isdir('accuracy_log'):
+    os.makedirs('accuracy_log')
+log_file_path = 'accuracy_log/%s_angle%d_grid%d.txt' % (
+    args.model, args.angle, args.grid_size,
+)
+
+with open(log_file_path, 'w') as log_file:
+    for epoch in range(1, args.epochs + 1):
+        train(epoch)
+        test(epoch)
