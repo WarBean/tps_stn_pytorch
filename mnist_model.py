@@ -49,7 +49,7 @@ class BoundedGridLocNet(nn.Module):
         super(BoundedGridLocNet, self).__init__()
         self.cnn = CNN(grid_size ** 2 * 2)
 
-        control_points = get_control_points(grid_size).clip(-0.999, 0.999)
+        control_points = get_control_points(grid_size).clip(-0.9, 0.9)
         bias = np.arctanh(control_points)
         bias = torch.from_numpy(bias).view(-1)
         self.cnn.fc2.bias.data.copy_(bias)

@@ -25,12 +25,13 @@ TPS-STN has been used in OCR application [[2]](#ref-2). In this paper TPS-STN is
 
 - Python3
 - PyTorch
-- TorchVision
+- Torchvision
 - Numpy
+- Matplotlib
 - Pillow / PIL
 - imageio
 
-I use `imageio` for creating GIF visualization. Simply install it by `pip install imageio`.
+I use `imageio` to create GIF visualization. Simply install it by `pip install imageio`.
 
 ## Run
 
@@ -52,12 +53,44 @@ There are three controllable arguments: `--model`, `--angle`, `--grid_size`.
 - With `unbounded_stn`, the output of locolizaition network is not squeezed
 
 `--angle`: int, default = 60
-- Samples in MNIST dataset will be rotated by random angle within `[-angle, angle]`
+- Samples in MNIST dataset will be rotated by random angles within `[-angle, angle]`
 
 `--grid_size`: int, default = 4
 - Use `(grid_size x grid_size)` control points to define Thin Plate Spline transformation
 
-## Visualization Results
+## Test Accuracy Curves
+
+//TODO
+
+## Visualize TPS-STN
+
+Results with `angle = 90` is generally bad:
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/angle90_bad1.gif" height = "200"/>
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/angle90_bad2.gif" height = "200"/>
+
+Results with `bounded_stn` is bad if `grid_size <= 3`:
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/bounded_bad1.gif" height = "200"/>
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/bounded_bad2.gif" height = "200"/>
+
+But ok if `grid_size >= 4`:
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/bounded_good1.gif" height = "200"/>
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/bounded_good2.gif" height = "200"/>
+
+Results with `unbounded_stn` is ok:
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/unbounded_good1.gif" height = "200"/>
+
+<img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/unbounded_good2.gif" height = "200"/>
+
+Off course there are always bad cases in each combination. You can download all my GIFs from Baidu Netdisk (1.9G).
+
+
 
 ## Reference
 
