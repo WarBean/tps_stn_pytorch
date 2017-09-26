@@ -22,4 +22,5 @@ for i in range(max_iter):
         args.model, args.angle, args.grid_size, i,
     )))
     images = [imageio.imread(path) for path in paths]
+    for _ in range(20): images.append(images[-1]) # delay at the end
     imageio.mimsave(gif_dir + 'sample%03d.gif' % i, images)

@@ -24,7 +24,7 @@ parser.add_argument('--log-interval', type = int, default = 10)
 parser.add_argument('--save-interval', type = int, default = 100)
 parser.add_argument('--model', required = True)
 parser.add_argument('--angle', type = int, default=60)
-parser.add_argument('--grid_size', type = int, default = 3)
+parser.add_argument('--grid_size', type = int, default = 4)
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 

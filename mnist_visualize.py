@@ -19,7 +19,7 @@ parser.add_argument('--batch-size', type = int, default = 64)
 parser.add_argument('--angle', type = int, default = 60)
 parser.add_argument('--no-cuda', action = 'store_true', default = False)
 parser.add_argument('--model', required = True)
-parser.add_argument('--grid_size', type = int, default = 3)
+parser.add_argument('--grid_size', type = int, default = 4)
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 random.seed(1024)
@@ -86,5 +86,5 @@ for pi, path in enumerate(paths): # path index
                 if k > 0: # connect to up
                     x2, y2 = source_points[j, k - 1]
                     draw.line((x1, y1, x2, y2), fill = (255, 0, 0))
-        draw.text((10, 0), 'sample %03d, iter %03d' % (si, pi), fill = (255, 0, 0), font = font)
-        canvas.save(image_dir + 'sample%03d_iter%03d.png' % (si, pi))
+        draw.text((10, 0), 'sample %03d, iter %03d' % (si, len(paths) - 1 - pi), fill = (255, 0, 0), font = font)
+        canvas.save(image_dir + 'sample%03d_iter%03d.png' % (si, len(paths) - 1 - pi))
