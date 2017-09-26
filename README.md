@@ -64,13 +64,13 @@ There are three controllable arguments: `--model`, `--angle`, `--grid_size`.
 
 ## Visualize TPS-STN
 
-Results with `angle = 90` is generally bad:
+Results with `angle = 90` are generally bad:
 
 <img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/angle90_bad1.gif" height = "200"/>
 
 <img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/angle90_bad2.gif" height = "200"/>
 
-Results with `bounded_stn` is bad if `grid_size <= 3`:
+Results with `bounded_stn` are bad if `grid_size <= 3`:
 
 <img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/bounded_bad1.gif" height = "200"/>
 
@@ -82,13 +82,13 @@ But ok if `grid_size >= 4`:
 
 <img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/bounded_good2.gif" height = "200"/>
 
-Results with `unbounded_stn` is ok:
+Results with `unbounded_stn` are ok:
 
 <img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/unbounded_good1.gif" height = "200"/>
 
 <img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/unbounded_good2.gif" height = "200"/>
 
-Off course there are always bad cases in each combination. You can download all my GIFs from Baidu Netdisk (1.9G).
+Off course there are always bad cases in each combination. You can download all my GIFs from [Baidu Netdisk]() (file size 2G, not uploaded yet).
 
 
 
