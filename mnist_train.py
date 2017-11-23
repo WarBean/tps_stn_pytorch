@@ -24,9 +24,14 @@ parser.add_argument('--log-interval', type = int, default = 10)
 parser.add_argument('--save-interval', type = int, default = 100)
 parser.add_argument('--model', required = True)
 parser.add_argument('--angle', type = int, default=60)
+parser.add_argument('--span_range', type = int, default = 0.9)
 parser.add_argument('--grid_size', type = int, default = 4)
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
+
+args.span_range_height = args.span_range_width = args.span_range
+args.grid_height = args.grid_width = args.grid_size
+args.image_height = args.image_width = 28
 
 torch.manual_seed(args.seed)
 if args.cuda:

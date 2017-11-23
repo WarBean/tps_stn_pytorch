@@ -37,21 +37,14 @@ class ClsNet(nn.Module):
     def forward(self, x):
         return F.log_softmax(self.cnn(x))
 
-def get_control_points(grid_size):
-    return np.array(list(itertools.product(
-        np.arange(-1.0, 1.00001, 2.0 / (grid_size - 1)),
-        np.arange(-1.0, 1.00001, 2.0 / (grid_size - 1)),
-    )))
-
 class BoundedGridLocNet(nn.Module):
 
-    def __init__(self, grid_size):
+    def __init__(self, grid_height, grid_width, target_control_points):
         super(BoundedGridLocNet, self).__init__()
-        self.cnn = CNN(grid_size ** 2 * 2)
+        self.cnn = CNN(grid_height * grid_width * 2)
 
-        control_points = get_control_points(grid_size).clip(-0.9, 0.9)
-        bias = np.arctanh(control_points)
-        bias = torch.from_numpy(bias).view(-1)
+        bias = torch.from_numpy(np.arctanh(target_control_points.numpy()))
+        bias = bias.view(-1)
         self.cnn.fc2.bias.data.copy_(bias)
         self.cnn.fc2.weight.data.zero_()
 
@@ -62,12 +55,11 @@ class BoundedGridLocNet(nn.Module):
 
 class UnBoundedGridLocNet(nn.Module):
 
-    def __init__(self, grid_size):
+    def __init__(self, grid_height, grid_width, target_control_points):
         super(UnBoundedGridLocNet, self).__init__()
-        self.cnn = CNN(grid_size ** 2 * 2)
+        self.cnn = CNN(grid_height * grid_width * 2)
 
-        control_points = get_control_points(grid_size)
-        bias = torch.from_numpy(control_points).view(-1)
+        bias = target_control_points.view(-1)
         self.cnn.fc2.bias.data.copy_(bias)
         self.cnn.fc2.weight.data.zero_()
 
@@ -80,19 +72,33 @@ class STNClsNet(nn.Module):
 
     def __init__(self, args):
         super(STNClsNet, self).__init__()
+        self.args = args
+
+        r1 = args.span_range_height
+        r2 = args.span_range_width
+        assert r1 < 1 and r2 < 1 # if >= 1, arctanh will cause error in BoundedGridLocNet
+        target_control_points = torch.Tensor(list(itertools.product(
+            np.arange(-r1, r1 + 0.00001, 2.0  * r1 / (args.grid_height - 1)),
+            np.arange(-r2, r2 + 0.00001, 2.0  * r2 / (args.grid_width - 1)),
+        )))
+        Y, X = target_control_points.split(1, dim = 1)
+        target_control_points = torch.cat([X, Y], dim = 1)
+
         GridLocNet = {
             'unbounded_stn': UnBoundedGridLocNet,
             'bounded_stn': BoundedGridLocNet,
         }[args.model]
-        self.loc_net = GridLocNet(args.grid_size)
+        self.loc_net = GridLocNet(args.grid_height, args.grid_width, target_control_points)
+
+        self.tps = TPSGridGen(args.image_height, args.image_width, target_control_points)
+
         self.cls_net = ClsNet()
-        self.tps = TPSGridGen(28, 28, torch.from_numpy(get_control_points(args.grid_size)))
 
     def forward(self, x):
         batch_size = x.size(0)
         source_control_points = self.loc_net(x)
         source_coordinate = self.tps(source_control_points)
-        grid = source_coordinate.view(batch_size, 28, 28, 2)
+        grid = source_coordinate.view(batch_size, self.args.image_height, self.args.image_width, 2)
         transformed_x = grid_sample(x, grid)
         logit = self.cls_net(transformed_x)
         return logit
