@@ -35,9 +35,9 @@ I use `imageio` to create GIF visualization. Simply install it by `pip install i
 
 ## Run
 
-	python mnist_train.py --model unbounded_stn --angle 90 --gird_size 4
-	python mnist_visualize.py --model unbounded_stn --angle 90 --gird_size 4
-	python mnist_make_gif.py --model unbounded_stn --angle 90 --gird_size 4
+	python mnist_train.py --model unbounded_stn --angle 90 --grid_size 4
+	python mnist_visualize.py --model unbounded_stn --angle 90 --grid_size 4
+	python mnist_make_gif.py --model unbounded_stn --angle 90 --grid_size 4
 
 Then PNG and GIF resutls will be saved in `./image/unbounded_stn_angle60_grid4/` and `./gif/unbounded_stn_angle60_grid4/`.
 
@@ -88,7 +88,7 @@ Results with `unbounded_stn` are ok:
 
 <img src="https://raw.githubusercontent.com/warbean/tps_stn_pytorch/master/demo/unbounded_good2.gif" height = "200"/>
 
-Off course there are always bad cases in each combination. You can download all my GIFs from [Baidu Netdisk](https://pan.baidu.com/s/1c2KXPw0) (file size 2G).
+Of course there are always bad cases in each combination. You can download all my GIFs from [Baidu Netdisk](https://pan.baidu.com/s/1c2KXPw0) (file size 2G).
 
 
 

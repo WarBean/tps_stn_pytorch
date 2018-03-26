@@ -26,6 +26,7 @@ def get_test_loader(args):
         datasets.MNIST(
             'mnist_data',
             train = False,
+            download = True,
             transform = transforms.Compose([
                 transforms.Lambda(lambda image: image.rotate(random.random() * args.angle * 2 - args.angle)),
                 transforms.ToTensor(),
